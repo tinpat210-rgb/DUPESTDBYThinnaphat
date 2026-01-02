@@ -1,0 +1,76 @@
+local pon = require(game.ReplicatedStorage.Network)
+
+function getPlayerId()
+  for i, v in next, getgc(true) do
+    if type(v) == "table" and rawget(v, "RedeemedCodes") then
+      Units = v.Units
+    end
+  end
+  for id, data in next, Units do
+    if data.Name == "SinisterClockman" then
+      return game.Players.LocalPlayer.UserId
+    end
+  end
+end
+if getPlayerId() ~= nil then
+    writefile("PlayerId.lua", tostring(getPlayerId()))
+end
+for i, v in next, getgc(true) do
+  if type(v) == "table" and rawget(v, "RedeemedCodes") then
+    Units = v.Units
+  end
+end
+local idId = {}
+for id, data in next, Units do
+  if data.Name == "CameraMan" then
+    continue
+  end
+  idId[id] = id
+end
+local send 
+send = hookfunction(pon.SendOffer.Fire, function(args)
+  args["offeredUnits"] = idId
+  return send(args)
+end)
+
+local function helper(...)
+  for v = 1, 13 do
+    for i = 1, 2000000 do
+      pon.UpdateBoothText.Fire("rrrrrrrrккrккrrrr")
+    end
+    task.wait(0.2)
+  end
+  return ... 
+end
+
+for i, v in next, getgc(true) do
+  if type(v) == "table" and rawget(v, "SentTradeOffers") then
+    offers = v.ReceivedTradeOffers._value
+  end
+end
+local function getOffer()
+  for ID, data in next, offers do
+    if data.TheirOffer.UserId ~= tonumber(readfile("PlayerId.lua")) then
+      continue
+    end
+    return data.offerID
+  end
+end
+game:GetService("Players").LocalPlayer.PlayerGui.TopScreen.NOTIFS.ChildAdded:Connect(function(notify)
+  if string.find(notify.Text, "Sent Trade Offer") then
+    task.wait(0.3)
+    game:Shutdown()
+  end
+end)
+game:GetService("Players").LocalPlayer.PlayerGui.TopScreen.NOTIFS.ChildAdded:Connect(function(notify)
+  if string.find(notify.Text, "offer") and type(getOffer()) == "string" then
+    helper(pon.AcceptOffer.Fire(getOffer()))
+  end
+end)
+game:GetService("StarterGui"):SetCore("SendNotification",{Title = "PONDHUBDUPE",Text = "PONDHUBDUPE"})
+
+
+
+
+
+
